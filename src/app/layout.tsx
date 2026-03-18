@@ -4,6 +4,7 @@ import "./globals.css";
 import { SessionProvider } from "@/providers/session-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           <SessionProvider>
             <QueryProvider>{children}</QueryProvider>
           </SessionProvider>
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>
