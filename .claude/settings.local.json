@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /d/Projects/3D_Printing_Assistant -name *)",
+      "Bash(npx:*)",
+      "Bash(cp:*)",
+      "Bash(TMPDIR=\"/c/Users/tapan/AppData/Local/Temp/3d-printing-assistant\")",
+      "Bash(DEST=\"/d/Projects/3D_Printing_Assistant\")",
+      "Bash(for f:*)",
+      "Bash(do cp:*)",
+      "Bash(echo \"Copied $f\")",
+      "Bash(npm install:*)"
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─── App Settings ─────────────────────────────────────────────────────────────
+
+model AppSettings {
+  id                 String   @id @default(cuid())
+  electricityRateKwh Float    @default(0.12)
+  printerWattage     Float    @default(200)
+  laborRatePerHour   Float    @default(15.00)
+  defaultPlatformFee Float    @default(6.5)
+  currencySymbol     String   @default("$")
+  lowStockThresholdG Int      @default(100)
+  updatedAt          DateTime @updatedAt
+}
+
+// ─── Filament Inventory ───────────────────────────────────────────────────────
+
+model Filament {
+  id                 String             @id @default(cuid())
+  brand              String
+  type               String             // "PLA" | "PETG" | "ABS" | "ASA" | "TPU" | etc.
+  colorName          String
+  colorHex           String
+  totalWeightG       Int
+  remainingWeightG   Int
+  spoolCount         Int                @default(1)
+  purchasePriceTotal Float
+  lowStockThresholdG Int?
+  notes              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  usageLogs          FilamentUsageLog[]
+  printJobs          PrintJob[]
+
+  @@index([type])
+  @@index([brand])
+}
+
+model FilamentUsageLog {
+  id         String    @id @default(cuid())
+  filamentId String
+  filament   Filament  @relation(fields: [filamentId], references: [id], onDelete: Cascade)
+  printJobId String?
+  printJob   PrintJob? @relation(fields: [printJobId], references: [id])
+  gramsUsed  Float
+  note       String?
+  loggedAt   DateTime  @default(now())
+
+  @@index([filamentId])
+  @@index([loggedAt])
+}
+
+// ─── Product Catalog ──────────────────────────────────────────────────────────
+
+model Product {
+  id          String               @id @default(cuid())
+  name        String
+  description String?
+  category    String
+  status      String               @default("DRAFT") // "DRAFT" | "ACTIVE" | "ARCHIVED"
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  variants    ProductVariant[]
+  assets      ProductAsset[]
+  listings    MarketplaceListing[]
+  printJobs   PrintJob[]
+
+  @@index([status])
+  @@index([category])
+}
+
+model ProductVariant {
+  id             String    @id @default(cuid())
+  productId      String
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku            String    @unique
+  name           String
+  sellingPrice   Float
+  materialCostG  Float
+  printTimeHours Float
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  printJobs      PrintJob[]
+
+  @@index([productId])
+}
+
+// ─── Assets ───────────────────────────────────────────────────────────────────
+
+model ProductAsset {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  assetType   String   // "IMAGE" | "MODEL_STL" | "MODEL_3MF" | "OTHER"
+  fileName    String
+  storagePath String
+  fileSize    Int
+  mimeType    String
+  isPrimary   Boolean  @default(false)
+  displayOrder Int     @default(0)
+  version     String?
+  versionNote String?
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@index([assetType])
+}
+
+// ─── Marketplace Listings ─────────────────────────────────────────────────────
+
+model MarketplaceListing {
+  id            String    @id @default(cuid())
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  marketplace   String    // "Etsy" | "Amazon" | "Shopify" | etc.
+  listingId     String?
+  listingUrl    String?
+  listedPrice   Float
+  platformFee   Float?
+  status        String    @default("DRAFT") // "DRAFT" | "ACTIVE" | "INACTIVE" | "SOLD_OUT"
+  dateListed    DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([productId])
+  @@index([status])
+}
+
+// ─── Print Jobs ───────────────────────────────────────────────────────────────
+
+model PrintJob {
+  id             String    @id @default(cuid())
+  title          String
+  productId      String?
+  product        Product?  @relation(fields: [productId], references: [id])
+  variantId      String?
+  variant        ProductVariant? @relation(fields: [variantId], references: [id])
+  filamentId     String?
+  filament       Filament? @relation(fields: [filamentId], references: [id])
+  status         String    @default("QUEUED") // "QUEUED" | "IN_PROGRESS" | "COMPLETED" | "FAILED" | "CANCELLED"
+  estimatedHours Float?
+  actualHours    Float?
+  gramsUsed      Float?
+  scheduledAt    DateTime?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  usageLogs      FilamentUsageLog[]
+
+  @@index([status])
+  @@index([productId])
+  @@index([filamentId])
+}
