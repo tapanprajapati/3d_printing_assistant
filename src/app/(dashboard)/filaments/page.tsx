@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { Package } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
-import { FilamentCard } from "@/components/filaments/filament-card";
+import { FilamentTable } from "@/components/filaments/filament-table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -14,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useFilaments } from "@/lib/hooks/use-filaments";
 import type { Filament } from "@/components/filaments/filament-card";
 
@@ -24,13 +24,19 @@ export default function FilamentsPage() {
   const router = useRouter();
   const [typeFilter, setTypeFilter] = useState("All");
   const [lowStockOnly, setLowStockOnly] = useState(false);
+  const [search, setSearch] = useState("");
 
   const { data, isLoading } = useFilaments({
     type: typeFilter !== "All" ? typeFilter : undefined,
     lowStock: lowStockOnly || undefined,
   });
 
-  const filaments = (data?.data ?? []) as Filament[];
+  const allFilaments = (data?.data ?? []) as Filament[];
+  const filaments = allFilaments.filter((f) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return f.brand.toLowerCase().includes(q) || f.colorName.toLowerCase().includes(q);
+  });
 
   return (
     <div>
@@ -60,16 +66,17 @@ export default function FilamentsPage() {
         >
           Low Stock Only {lowStockOnly && "✓"}
         </Button>
+
+        <Input
+          placeholder="Search by brand or color…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-56"
+        />
       </div>
 
       {/* Content */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-52 rounded-lg" />
-          ))}
-        </div>
-      ) : filaments.length === 0 ? (
+      {!isLoading && filaments.length === 0 ? (
         <EmptyState
           icon={Package}
           title="No filaments yet"
@@ -81,11 +88,7 @@ export default function FilamentsPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filaments.map((f) => (
-            <FilamentCard key={f.id} filament={f} />
-          ))}
-        </div>
+        <FilamentTable filaments={filaments} isLoading={isLoading} />
       )}
     </div>
   );

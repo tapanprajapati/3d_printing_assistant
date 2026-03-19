@@ -1,13 +1,30 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
+import { KanbanBoard } from "@/components/print-jobs/kanban-board";
 
 export default function PrintQueuePage() {
+  const [showArchived, setShowArchived] = useState(false);
+
   return (
     <div>
-      <PageHeader title="Print Queue" description="Track your print jobs" />
-      <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
-        <p className="text-lg font-medium">Coming in Milestone 3</p>
-        <p className="text-sm mt-1">Kanban-style print job tracking with filament usage logging.</p>
-      </div>
+      <PageHeader title="Print Queue" description="Manage your active print jobs">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowArchived((v) => !v)}
+        >
+          {showArchived ? "Hide Archived" : "Show Archived"}
+        </Button>
+        <Button asChild size="sm">
+          <Link href="/print-queue/new">+ New Job</Link>
+        </Button>
+      </PageHeader>
+
+      <KanbanBoard showArchived={showArchived} />
     </div>
   );
 }

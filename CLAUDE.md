@@ -49,26 +49,7 @@ shadcn/ui components live in `src/components/ui/`. Shared layout components in `
 ### Path Alias
 `@/*` resolves to `src/*`.
 
-## Implementation Status
-
-| Milestone | Feature | Status |
-|---|---|---|
-| M0 | Auth, shell layout, DB schema, providers, dashboard | ✅ Complete |
-| M1 | Filament inventory (CRUD, usage logs, low-stock badge) | ✅ Complete |
-| M2 | Product catalog | ⬜ Not started |
-| M3 | Print job queue | ⬜ Not started |
-| M4 | Cost calculator | ⬜ Not started |
-| M5 | Analytics | ⬜ Not started |
-| M6 | Settings | ⬜ Not started |
-
-### M1 — Filament Inventory (complete)
-- `src/lib/validations/filament.ts` — Zod schemas (FilamentSchema, FilamentUpdateSchema, UsageLogSchema)
-- `src/app/api/filaments/` — REST API (list/create, get/update/delete, usage log list/post with `$transaction`)
-- `src/lib/hooks/use-filaments.ts` — TanStack Query hooks
-- `src/components/filaments/` — ColorSwatch, FilamentCard, FilamentForm, UsageLogTable
-- `src/components/shared/` — EmptyState, ConfirmDialog
-- Pages: `/filaments`, `/filaments/new`, `/filaments/[id]`, `/filaments/[id]/usage`
-- Dashboard layout queries low-stock count → Topbar bell badge
-- Toaster (Sonner) added to root layout
-
-See `PLAN.md` and `TECH_SPEC.md` for the full implementation roadmap.
+### Planning documents
+Always refer to following docs for implementation details
+- `PLAN.md` for project planning
+- `TECH_SPEC.md` for the full implementation roadmap
