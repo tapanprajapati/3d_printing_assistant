@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductForm } from "@/components/products/product-form";
 import { VariantTable } from "@/components/products/variant-table";
 import { AssetTab } from "@/components/products/asset-tab";
+import { ListingsTab } from "@/components/products/listings-tab";
 import { useProduct, useUpdateProduct } from "@/lib/hooks/use-products";
 import { toast } from "sonner";
 import type { ProductInput } from "@/lib/validations/product";
@@ -118,12 +119,7 @@ export default function ProductDetailPage() {
         </TabsContent>
 
         <TabsContent value="listings">
-          <Card className="max-w-2xl">
-            <CardContent className="pt-6 text-center text-muted-foreground">
-              <p className="font-medium">Marketplace listings coming soon (M4)</p>
-              <p className="text-sm mt-1">Manage your Etsy and other marketplace listings here in a future update.</p>
-            </CardContent>
-          </Card>
+          <ListingsTab productId={id} />
         </TabsContent>
       </Tabs>
     </div>

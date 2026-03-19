@@ -9,7 +9,15 @@
       "Bash(for f:*)",
       "Bash(do cp:*)",
       "Bash(echo \"Copied $f\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(npm list:*)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" npx prisma db push 2>&1)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" SEED_EMAIL=admin@local.dev SEED_PASSWORD=changeme npx tsx prisma/seed.ts 2>&1)",
+      "Bash(npm run:*)",
+      "Bash(ls:*)",
+      "Bash(ls 'D:\\\\Projects\\\\3D_Printing_Assistant\\\\src\\\\app\\\\\\(dashboard\\)\\\\print-queue')",
+      "Bash(find D:/Projects/3D_Printing_Assistant/src/components/print-jobs -name *.tsx -o -name *.ts)"
     ]
   }
 }

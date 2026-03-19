@@ -61,12 +61,12 @@ export function PrintJobForm({
   const filaments = filamentsData?.data ?? [];
 
   function handleProductChange(value: string) {
-    form.setValue("productId", value || undefined);
+    form.setValue("productId", value === "__none__" ? undefined : value);
     form.setValue("variantId", undefined);
   }
 
   function handleVariantChange(value: string) {
-    form.setValue("variantId", value || undefined);
+    form.setValue("variantId", value === "__none__" ? undefined : value);
     const variant = variants.find((v: { id: string; printTimeHours: number }) => v.id === value);
     if (variant?.printTimeHours != null) {
       form.setValue("estimatedHours", variant.printTimeHours);
@@ -120,7 +120,7 @@ export function PrintJobForm({
                 </FormLabel>
                 <Select
                   onValueChange={handleProductChange}
-                  value={field.value ?? ""}
+                  value={field.value ?? "__none__"}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -128,7 +128,7 @@ export function PrintJobForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {products.map((p: { id: string; name: string }) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.name}
@@ -152,7 +152,7 @@ export function PrintJobForm({
                 </FormLabel>
                 <Select
                   onValueChange={handleVariantChange}
-                  value={field.value ?? ""}
+                  value={field.value ?? "__none__"}
                   disabled={!productId}
                 >
                   <FormControl>
@@ -161,7 +161,7 @@ export function PrintJobForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {variants.map((v: { id: string; name: string }) => (
                       <SelectItem key={v.id} value={v.id}>
                         {v.name}
@@ -184,8 +184,8 @@ export function PrintJobForm({
                   Filament <span className="text-muted-foreground font-normal">optional</span>
                 </FormLabel>
                 <Select
-                  onValueChange={(v) => form.setValue("filamentId", v || undefined)}
-                  value={field.value ?? ""}
+                  onValueChange={(v) => form.setValue("filamentId", v === "__none__" ? undefined : v)}
+                  value={field.value ?? "__none__"}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -193,7 +193,7 @@ export function PrintJobForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {filaments.map((f: { id: string; brand: string; colorName: string; type: string }) => (
                       <SelectItem key={f.id} value={f.id}>
                         {f.brand} {f.colorName} ({f.type})
