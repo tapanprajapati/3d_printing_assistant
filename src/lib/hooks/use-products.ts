@@ -85,7 +85,22 @@ export function useDeleteProduct() {
   });
 }
 
+export function useProductCategories() {
+  return useQuery({
+    queryKey: ["product-categories"],
+    queryFn: () => fetchJson("/api/products?categories=true").then((r) => r.data as string[]),
+  });
+}
+
 // ─── Variants ─────────────────────────────────────────────────────────────────
+
+export function useVariantById(variantId?: string) {
+  return useQuery({
+    queryKey: ["variant", variantId],
+    queryFn: () => fetchJson(`/api/variants/${variantId}`).then((r) => r.data),
+    enabled: !!variantId,
+  });
+}
 
 export function useProductVariants(productId: string) {
   return useQuery({

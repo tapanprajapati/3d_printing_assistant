@@ -15,16 +15,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useProducts } from "@/lib/hooks/use-products";
+import { useProducts, useProductCategories } from "@/lib/hooks/use-products";
 import type { Product } from "@/components/products/product-card";
 
 export default function ProductsPage() {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("All");
   const [search, setSearch] = useState("");
+
+  const { data: categoriesData } = useProductCategories();
+  const categories = categoriesData ?? [];
 
   const { data, isLoading } = useProducts({
     status: statusFilter !== "All" ? statusFilter : undefined,
+    category: categoryFilter !== "All" ? categoryFilter : undefined,
     search: search || undefined,
   });
 
@@ -47,6 +52,18 @@ export default function ProductsPage() {
             <SelectItem value="DRAFT">Draft</SelectItem>
             <SelectItem value="ACTIVE">Active</SelectItem>
             <SelectItem value="ARCHIVED">Archived</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="All">All categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
 

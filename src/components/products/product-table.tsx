@@ -75,6 +75,8 @@ function ProductRow({ product }: { product: Product }) {
       </TableCell>
       <TableCell>
         {product._count.variants} variant{product._count.variants !== 1 ? "s" : ""}
+        {" · "}
+        {product._count.listings} listing{product._count.listings !== 1 ? "s" : ""}
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-1">

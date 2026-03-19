@@ -16,11 +16,21 @@ export async function GET(req: Request) {
   if (category) where.category = category;
   if (search) where.name = { contains: search };
 
+  // ?categories=true — return distinct category list
+  if (searchParams.get("categories") === "true") {
+    const rows = await prisma.product.findMany({
+      select: { category: true },
+      distinct: ["category"],
+      orderBy: { category: "asc" },
+    });
+    return Response.json({ data: rows.map((r) => r.category) });
+  }
+
   const products = await prisma.product.findMany({
     where,
     orderBy: { createdAt: "desc" },
     include: {
-      _count: { select: { variants: true } },
+      _count: { select: { variants: true, listings: true } },
       assets: { where: { isPrimary: true, assetType: "IMAGE" }, take: 1 },
     },
   });

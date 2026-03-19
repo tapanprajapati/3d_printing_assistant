@@ -15,7 +15,7 @@ export interface Product {
   description: string | null;
   category: string;
   status: "DRAFT" | "ACTIVE" | "ARCHIVED";
-  _count: { variants: number };
+  _count: { variants: number; listings: number };
   assets?: { storagePath: string; fileName: string }[];
 }
 
@@ -73,6 +73,8 @@ export function ProductCard({ product }: ProductCardProps) {
           <Badge variant="secondary">{product.category}</Badge>
           <span className="text-sm text-muted-foreground">
             {product._count.variants} variant{product._count.variants !== 1 ? "s" : ""}
+            {" · "}
+            {product._count.listings} listing{product._count.listings !== 1 ? "s" : ""}
           </span>
         </div>
 
