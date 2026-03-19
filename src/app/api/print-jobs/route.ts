@@ -21,7 +21,13 @@ export async function GET(req: Request) {
     where,
     orderBy: { createdAt: "desc" },
     include: {
-      product: { select: { id: true, name: true } },
+      product: {
+        select: {
+          id: true,
+          name: true,
+          assets: { where: { isPrimary: true, assetType: "IMAGE" }, take: 1 },
+        },
+      },
       variant: { select: { id: true, name: true } },
       filament: { select: { id: true, brand: true, colorName: true, colorHex: true, type: true } },
     },

@@ -20,7 +20,7 @@ interface PrintJobCardJob {
   actualHours?: number | null;
   scheduledAt?: string | null;
   notes?: string | null;
-  product?: { id: string; name: string } | null;
+  product?: { id: string; name: string; assets?: { storagePath: string; fileName: string }[] } | null;
   variant?: { id: string; name: string } | null;
   filament?: { id: string; brand: string; colorName: string; colorHex: string; type: string } | null;
 }
@@ -91,10 +91,19 @@ export function JobCard({ job }: JobCardProps) {
 
         <CardContent className="pb-2 flex-1 space-y-1.5 text-sm text-muted-foreground">
           {job.product && (
-            <p className="truncate">
-              <span className="font-medium text-foreground">{job.product.name}</span>
-              {job.variant && <span> — {job.variant.name}</span>}
-            </p>
+            <div className="flex items-center gap-2">
+              {job.product.assets?.[0] && (
+                <img
+                  src={job.product.assets[0].storagePath}
+                  alt={job.product.assets[0].fileName}
+                  className="h-8 w-8 rounded object-cover bg-muted shrink-0"
+                />
+              )}
+              <p className="truncate">
+                <span className="font-medium text-foreground">{job.product.name}</span>
+                {job.variant && <span> — {job.variant.name}</span>}
+              </p>
+            </div>
           )}
 
           {job.filament && (

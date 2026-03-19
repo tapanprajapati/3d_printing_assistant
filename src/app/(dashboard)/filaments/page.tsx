@@ -20,11 +20,23 @@ import type { Filament } from "@/components/filaments/filament-card";
 
 const FILAMENT_TYPES = ["All", "PLA", "PETG", "ABS", "ASA", "TPU", "Nylon", "Resin", "Other"];
 
+type SortKey = "brand" | "remaining-asc" | "remaining-desc" | "newest";
+
+function sortFilaments(filaments: Filament[], sort: SortKey): Filament[] {
+  return [...filaments].sort((a, b) => {
+    if (sort === "brand") return a.brand.localeCompare(b.brand);
+    if (sort === "remaining-asc") return a.remainingWeightG - b.remainingWeightG;
+    if (sort === "remaining-desc") return b.remainingWeightG - a.remainingWeightG;
+    return 0; // "newest" — server already returns by createdAt desc
+  });
+}
+
 export default function FilamentsPage() {
   const router = useRouter();
   const [typeFilter, setTypeFilter] = useState("All");
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortKey>("newest");
 
   const { data, isLoading } = useFilaments({
     type: typeFilter !== "All" ? typeFilter : undefined,
@@ -32,11 +44,14 @@ export default function FilamentsPage() {
   });
 
   const allFilaments = (data?.data ?? []) as Filament[];
-  const filaments = allFilaments.filter((f) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return f.brand.toLowerCase().includes(q) || f.colorName.toLowerCase().includes(q);
-  });
+  const filaments = sortFilaments(
+    allFilaments.filter((f) => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return f.brand.toLowerCase().includes(q) || f.colorName.toLowerCase().includes(q);
+    }),
+    sort
+  );
 
   return (
     <div>
@@ -66,6 +81,18 @@ export default function FilamentsPage() {
         >
           Low Stock Only {lowStockOnly && "✓"}
         </Button>
+
+        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Sort by…" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest First</SelectItem>
+            <SelectItem value="brand">Brand A→Z</SelectItem>
+            <SelectItem value="remaining-asc">Remaining: Low→High</SelectItem>
+            <SelectItem value="remaining-desc">Remaining: High→Low</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Input
           placeholder="Search by brand or color…"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Package, Pencil, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -40,8 +40,23 @@ function ProductRow({ product }: { product: Product }) {
     });
   }
 
+  const primaryImage = product.assets?.[0];
+
   return (
     <TableRow>
+      <TableCell className="w-12">
+        {primaryImage ? (
+          <img
+            src={primaryImage.storagePath}
+            alt={primaryImage.fileName}
+            className="h-10 w-10 rounded object-cover bg-muted"
+          />
+        ) : (
+          <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </div>
+        )}
+      </TableCell>
       <TableCell>
         <p className="font-medium">{product.name}</p>
         {product.description && (
@@ -93,6 +108,7 @@ export function ProductTable({ products, isLoading }: ProductTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-12"></TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
@@ -104,7 +120,7 @@ export function ProductTable({ products, isLoading }: ProductTableProps) {
           {isLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
-                {Array.from({ length: 5 }).map((_, j) => (
+                {Array.from({ length: 6 }).map((_, j) => (
                   <TableCell key={j}>
                     <Skeleton className="h-4 w-full" />
                   </TableCell>
