@@ -31,13 +31,24 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+# Standalone Next.js bundle (includes server.js + minimal node_modules)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# Static assets must sit alongside the standalone bundle
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Entrypoint tools: prisma CLI + client, tsx (for seed), prisma schema
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/tsx   ./node_modules/.bin/tsx
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma    ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma    ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma     ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/tsx        ./node_modules/tsx
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --chown=nextjs:nodejs docker-entrypoint.sh /entrypoint.sh
 
+COPY --chown=nextjs:nodejs docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \
  && mkdir -p /app/data /app/public/uploads/images /app/public/uploads/models \
  && chown -R nextjs:nodejs /app/data /app/public/uploads
@@ -46,5 +57,6 @@ USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]

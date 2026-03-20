@@ -1,22 +1,21 @@
 steps:
   - name: gcr.io/cloud-builders/docker
+    id: Build
     args:
       - build
-      - '--no-cache'
       - '-t'
       - >-
         $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
       - .
       - '-f'
       - Dockerfile
-    id: Build
 
   - name: gcr.io/cloud-builders/docker
+    id: Push
     args:
       - push
       - >-
         $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-    id: Push
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: Deploy
@@ -37,11 +36,11 @@ steps:
       - '--max-instances=1'
       - '--clear-volume-mounts'
       - '--clear-volumes'
-      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
+      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs:only-dir=data'
       - '--add-volume-mount=volume=gcs-data,mount-path=/app/data'
-      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
+      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs:only-dir=uploads'
       - '--add-volume-mount=volume=gcs-uploads,mount-path=/app/public/uploads'
-      - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET,AUTH_TRUST_HOST=true,SEED_ON_START=true'
+      - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL,AUTH_TRUST_HOST=true,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET,SEED_EMAIL=$_SEED_EMAIL,SEED_PASSWORD=$_SEED_PASSWORD'
 
 images:
   - >-
@@ -57,10 +56,12 @@ substitutions:
   _TRIGGER_ID: a399fdee-5375-4c30-9310-f4178e226599
   _AR_REPOSITORY: cloud-run-source-deploy
   _AR_PROJECT_ID: d-printing-assistant-490723
-  _PLATFORM: managed
   _SERVICE_NAME: printing-assistant
-  _GCS_BUCKET: printing-assistant-data        # ← set to your actual bucket name
+  _GCS_BUCKET: printing-assistant-data
   _NEXTAUTH_URL: https://printing-assistant-549862892095.us-east1.run.app
+  # _NEXTAUTH_SECRET: set in Cloud Build trigger UI (not committed here)
+  # _SEED_EMAIL:      set in Cloud Build trigger UI (not committed here)
+  # _SEED_PASSWORD:   set in Cloud Build trigger UI (not committed here)
 
 tags:
   - gcp-cloud-build-deploy-cloud-run
