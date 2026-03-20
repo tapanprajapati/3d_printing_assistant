@@ -10,9 +10,7 @@ export const ListingCreateSchema = z.object({
     .or(z.literal("")),
   listedPrice: z.number().positive("Price must be positive"),
   platformFee: z.number().min(0).max(100).optional(),
-  status: z
-    .enum(["DRAFT", "ACTIVE", "INACTIVE", "SOLD_OUT"])
-    .default("DRAFT"),
+  status: z.enum(["DRAFT", "ACTIVE", "INACTIVE", "SOLD_OUT"]),
   dateListed: z.string().datetime().optional().or(z.literal("")),
   notes: z.string().optional(),
 });
