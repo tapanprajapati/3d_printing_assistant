@@ -11,6 +11,25 @@ import { RevenueChart } from "@/components/analytics/revenue-chart";
 import { FilamentPieChart } from "@/components/analytics/filament-pie-chart";
 import { TopProductsTable } from "@/components/analytics/top-products-table";
 
+interface FilamentUsageItem {
+  brand: string;
+  colorName: string;
+  totalGrams: number;
+  colorHex: string;
+}
+
+interface AnalyticsData {
+  summary: {
+    totalRevenue: number;
+    totalProfit: number;
+    overallMarginPct: number;
+    jobsCompleted: number;
+  };
+  monthlyRevenue: { month: string; revenue: number; profit: number; jobs: number }[];
+  filamentUsage: FilamentUsageItem[];
+  topProducts: { productName: string; totalRevenue: number; profit: number; avgMarginPct: number }[];
+}
+
 const currentYear = new Date().getFullYear();
 const lastYear = currentYear - 1;
 
@@ -55,7 +74,7 @@ export default function AnalyticsPage() {
   const [to, setTo] = useState(`${currentYear}-12-31`);
 
   const { data: response, isLoading } = useAnalytics(from, to);
-  const data = response?.data;
+  const data = response?.data as AnalyticsData | undefined;
   const summary = data?.summary;
   const isEmpty = !isLoading && (summary?.jobsCompleted ?? 0) === 0;
 
