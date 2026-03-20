@@ -21,6 +21,14 @@ ENV NEXTAUTH_URL="http://localhost:3000"
 
 RUN npx prisma generate && npm run build
 
+# Compile seed script to plain JS and strip dev dependencies
+RUN npx tsc prisma/seed.ts \
+      --module commonjs --moduleResolution node \
+      --esModuleInterop --target es2020 \
+      --skipLibCheck --noEmit false \
+      --outDir prisma/dist \
+ && npm prune --production
+
 # ─── Stage 2: Runner ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
 
@@ -38,14 +46,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Entrypoint tools: prisma CLI + client, tsx (for seed), prisma schema
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma/build/prisma_schema_build_bg.wasm ./node_modules/.bin/prisma_schema_build_bg.wasm
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/tsx   ./node_modules/.bin/tsx
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma    ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma    ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma     ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/tsx        ./node_modules/tsx
+# Full pruned node_modules — directory copy preserves .bin/ symlinks
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Prisma schema + compiled seed, app manifest
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 

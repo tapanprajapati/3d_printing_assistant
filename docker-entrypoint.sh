@@ -14,7 +14,7 @@ sqlite3 /mnt/data/dev.db "PRAGMA journal_mode=DELETE;" 2>/dev/null || true
 USER_COUNT=$(sqlite3 /mnt/data/dev.db "SELECT COUNT(*) FROM User;" 2>/dev/null || echo "0")
 if [ "$USER_COUNT" = "0" ]; then
   echo "[entrypoint] Fresh database — running seed..."
-  /app/node_modules/.bin/tsx /app/prisma/seed.ts
+  node /app/prisma/dist/seed.js
 else
   echo "[entrypoint] Existing database — skipping seed."
 fi
