@@ -1,8 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "[entrypoint] Ensuring persistent directories exist..."
-mkdir -p /app/data /app/public/uploads/images /app/public/uploads/models
+trap 'echo "[entrypoint] ERROR: script failed at line $LINENO — check above for details" >&2' ERR
 
 if [ ! -f /app/data/dev.db ]; then
   echo "[entrypoint] Fresh install — running prisma db push..."
