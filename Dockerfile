@@ -50,4 +50,4 @@ USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/app/docker-entrypoint.sh"]

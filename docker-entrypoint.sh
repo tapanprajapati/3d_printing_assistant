@@ -1,5 +1,6 @@
 #!/bin/sh
-set -e
+echo "[entrypoint] script started" >&2
+set -ex
 
 if [ ! -f /app/data/dev.db ]; then
   echo "[entrypoint] Fresh install — running prisma db push..."
