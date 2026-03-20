@@ -39,9 +39,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --chown=nextjs:nodejs docker-entrypoint.sh /entrypoint.sh
 
-RUN chmod +x ./docker-entrypoint.sh \
+RUN chmod +x /entrypoint.sh \
  && mkdir -p /app/data /app/public/uploads/images /app/public/uploads/models \
  && chown -R nextjs:nodejs /app/data /app/public/uploads
 
@@ -50,4 +50,4 @@ USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 
-ENTRYPOINT ["/bin/sh", "/app/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
