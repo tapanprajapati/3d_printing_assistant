@@ -36,10 +36,10 @@ steps:
       - '--max-instances=1'
       - '--clear-volume-mounts'
       - '--clear-volumes'
-      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs:only-dir=data'
-      - '--add-volume-mount=volume=gcs-data,mount-path=/app/data'
-      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs:only-dir=uploads'
-      - '--add-volume-mount=volume=gcs-uploads,mount-path=/app/public/uploads'
+      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
+      - '--add-volume-mount=volume=gcs-data,mount-path=/app'
+      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
+      - '--add-volume-mount=volume=gcs-uploads,mount-path=/app'
       - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL,AUTH_TRUST_HOST=true,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET,SEED_EMAIL=$_SEED_EMAIL,SEED_PASSWORD=$_SEED_PASSWORD'
 
 images:
