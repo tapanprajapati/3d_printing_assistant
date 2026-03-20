@@ -39,7 +39,6 @@ steps:
       - '--add-volume-mount=volume=gcs-data,mount-path=/app/data'
       - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
       - '--add-volume-mount=volume=gcs-uploads,mount-path=/app/public/uploads'
-      - '--remove-secrets=NEXTAUTH_SECRET'
       - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET'
 
 images:
