@@ -9,34 +9,30 @@ async function main() {
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const user = await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: {
-      email,
-      passwordHash,
-      name: "Admin",
-    },
+  // Single transaction → one SQLite commit → one GCS FUSE file close → no race condition
+  await prisma.$transaction(async (tx) => {
+    const user = await tx.user.upsert({
+      where: { email },
+      update: {},
+      create: { email, passwordHash, name: "Admin" },
+    });
+    console.log(`✅ Seeded user: ${user.email}`);
+
+    const settings = await tx.appSettings.upsert({
+      where: { id: "default" },
+      update: {},
+      create: {
+        id: "default",
+        electricityRateKwh: 0.12,
+        printerWattage: 200,
+        laborRatePerHour: 15.0,
+        defaultPlatformFee: 6.5,
+        currencySymbol: "$",
+        lowStockThresholdG: 100,
+      },
+    });
+    console.log(`✅ Seeded AppSettings: id=${settings.id}`);
   });
-
-  console.log(`✅ Seeded user: ${user.email}`);
-
-  // Upsert default AppSettings singleton
-  const settings = await prisma.appSettings.upsert({
-    where: { id: "default" },
-    update: {},
-    create: {
-      id: "default",
-      electricityRateKwh: 0.12,
-      printerWattage: 200,
-      laborRatePerHour: 15.0,
-      defaultPlatformFee: 6.5,
-      currencySymbol: "$",
-      lowStockThresholdG: 100,
-    },
-  });
-
-  console.log(`✅ Seeded AppSettings: id=${settings.id}`);
 }
 
 main()
