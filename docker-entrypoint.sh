@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-trap 'echo "[entrypoint] ERROR: script failed at line $LINENO — check above for details" >&2' ERR
-
 if [ ! -f /app/data/dev.db ]; then
   echo "[entrypoint] Fresh install — running prisma db push..."
   npx prisma db push --skip-generate
