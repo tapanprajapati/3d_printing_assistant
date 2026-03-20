@@ -4,11 +4,13 @@ set -e
 echo "[entrypoint] Ensuring persistent directories exist..."
 mkdir -p /app/data /app/public/uploads/images /app/public/uploads/models
 
-echo "[entrypoint] Running prisma db push..."
-npx prisma db push --skip-generate
-
-echo "[entrypoint] Setting journal mode to DELETE for GCS FUSE compatibility..."
-sqlite3 /app/data/dev.db "PRAGMA journal_mode=DELETE;" 2>/dev/null || true
+if [ ! -f /app/data/dev.db ]; then
+  echo "[entrypoint] Fresh install — running prisma db push..."
+  npx prisma db push --skip-generate
+  sqlite3 /app/data/dev.db "PRAGMA journal_mode=DELETE;" 2>/dev/null || true
+else
+  echo "[entrypoint] Database exists — skipping prisma db push."
+fi
 
 if [ "${SEED_ON_START}" = "true" ]; then
   echo "[entrypoint] Seeding database..."
