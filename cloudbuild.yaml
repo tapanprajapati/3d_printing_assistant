@@ -35,9 +35,9 @@ steps:
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
       - '--execution-environment=gen2'
       - '--max-instances=1'
-      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs,uid=1001,gid=1001'
+      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
       - '--add-volume-mount=volume=gcs-data,mount-path=/app/data'
-      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs,uid=1001,gid=1001'
+      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
       - '--add-volume-mount=volume=gcs-uploads,mount-path=/app/public/uploads'
       - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL'
       - '--set-secrets=NEXTAUTH_SECRET=printing-assistant-nextauth-secret:latest'
