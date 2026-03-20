@@ -41,7 +41,7 @@ steps:
       - '--add-volume-mount=volume=gcs-data,mount-path=/app/data'
       - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
       - '--add-volume-mount=volume=gcs-uploads,mount-path=/app/public/uploads'
-      - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET'
+      - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET,AUTH_TRUST_HOST=true'
 
 images:
   - >-
@@ -60,7 +60,7 @@ substitutions:
   _PLATFORM: managed
   _SERVICE_NAME: printing-assistant
   _GCS_BUCKET: printing-assistant-data        # ← set to your actual bucket name
-  _NEXTAUTH_URL: https://printing-assistant-xxxx-ue.a.run.app  # ← set after first deploy
+  _NEXTAUTH_URL: https://printing-assistant-549862892095.us-east1.run.app
 
 tags:
   - gcp-cloud-build-deploy-cloud-run
