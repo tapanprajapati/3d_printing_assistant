@@ -5,7 +5,7 @@ echo "[entrypoint] Applying schema..."
 /app/node_modules/.bin/prisma db push --skip-generate
 
 # Symlink GCS uploads directory so Next.js static serving works
-rm -rf /app/public/uploads && ln -s /mnt/uploads /app/public/uploads
+rm -rf /app/public/uploads && ln -s /mnt/public/uploads /app/public/uploads
 
 # GCS FUSE does not support SQLite WAL mode; force DELETE journal mode
 sqlite3 /mnt/data/dev.db "PRAGMA journal_mode=DELETE;" 2>/dev/null || true

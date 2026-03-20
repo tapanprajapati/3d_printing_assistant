@@ -2,11 +2,11 @@ services:
   init:
     image: busybox
     command: >
-      sh -c "mkdir -p /data /uploads/images /uploads/models
-             && chown -R 1001:1001 /data /uploads"
+      sh -c "mkdir -p /data /public/uploads/images /public/uploads/models
+             && chown -R 1001:1001 /data /public/uploads"
     volumes:
       - ./data:/data
-      - ./public/uploads:/uploads
+      - ./public/uploads:/public/uploads
 
   app:
     build:
