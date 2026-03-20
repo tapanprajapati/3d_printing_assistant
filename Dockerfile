@@ -24,7 +24,7 @@ RUN npx prisma generate && npm run build
 # ─── Stage 2: Runner ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
 
-RUN apk add --no-cache libc6-compat openssl
+RUN apk add --no-cache libc6-compat openssl sqlite
 
 WORKDIR /app
 
