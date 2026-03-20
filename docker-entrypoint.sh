@@ -4,11 +4,14 @@ set -e
 echo "[entrypoint] Applying schema..."
 /app/node_modules/.bin/prisma db push --skip-generate
 
+# Symlink GCS uploads directory so Next.js static serving works
+rm -rf /app/public/uploads && ln -s /mnt/uploads /app/public/uploads
+
 # GCS FUSE does not support SQLite WAL mode; force DELETE journal mode
-sqlite3 /app/data/dev.db "PRAGMA journal_mode=DELETE;" 2>/dev/null || true
+sqlite3 /mnt/data/dev.db "PRAGMA journal_mode=DELETE;" 2>/dev/null || true
 
 # Only seed on a fresh database (no users = first run)
-USER_COUNT=$(sqlite3 /app/data/dev.db "SELECT COUNT(*) FROM User;" 2>/dev/null || echo "0")
+USER_COUNT=$(sqlite3 /mnt/data/dev.db "SELECT COUNT(*) FROM User;" 2>/dev/null || echo "0")
 if [ "$USER_COUNT" = "0" ]; then
   echo "[entrypoint] Fresh database — running seed..."
   /app/node_modules/.bin/tsx /app/prisma/seed.ts

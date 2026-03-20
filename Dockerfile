@@ -15,7 +15,7 @@ RUN npm ci
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL="file:/app/data/dev.db"
+ENV DATABASE_URL="file:/mnt/data/dev.db"
 ENV NEXTAUTH_SECRET="build-placeholder"
 ENV NEXTAUTH_URL="http://localhost:3000"
 
@@ -50,8 +50,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 COPY --chown=nextjs:nodejs docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \
- && mkdir -p /app/data /app/public/uploads/images /app/public/uploads/models \
- && chown -R nextjs:nodejs /app/data /app/public/uploads
+ && mkdir -p /mnt
 
 USER nextjs
 
