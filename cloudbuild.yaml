@@ -1,0 +1,67 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - .
+      - '-f'
+      - Dockerfile
+    id: Build
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: Deploy
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+      - >-
+        --image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--execution-environment=gen2'
+      - '--max-instances=1'
+      - '--add-volume=name=gcs-data,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
+      - '--add-volume-mount=volume=gcs-data,mount-path=/app/data'
+      - '--add-volume=name=gcs-uploads,type=cloud-storage,bucket=$_GCS_BUCKET,mount-options=implicit-dirs'
+      - '--add-volume-mount=volume=gcs-uploads,mount-path=/app/public/uploads'
+      - '--set-env-vars=DATABASE_URL=file:/app/data/dev.db,NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXTAUTH_URL=$_NEXTAUTH_URL'
+      - '--set-secrets=NEXTAUTH_SECRET=printing-assistant-nextauth-secret:latest'
+
+images:
+  - >-
+    $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _DEPLOY_REGION: us-east1
+  _AR_HOSTNAME: us-east1-docker.pkg.dev
+  _TRIGGER_ID: a399fdee-5375-4c30-9310-f4178e226599
+  _AR_REPOSITORY: cloud-run-source-deploy
+  _AR_PROJECT_ID: d-printing-assistant-490723
+  _PLATFORM: managed
+  _SERVICE_NAME: printing-assistant
+  _GCS_BUCKET: printing-assistant-data        # ← set to your actual bucket name
+  _NEXTAUTH_URL: https://printing-assistant-xxxx-ue.a.run.app  # ← set after first deploy
+
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - printing-assistant

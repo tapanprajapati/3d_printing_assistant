@@ -48,3 +48,6 @@ public/uploads/images/*
 public/uploads/models/*
 !public/uploads/images/.gitkeep
 !public/uploads/models/.gitkeep
+
+# Docker bind-mount data directory
+/data/

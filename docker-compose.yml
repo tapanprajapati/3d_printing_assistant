@@ -1,0 +1,27 @@
+services:
+  init:
+    image: busybox
+    command: >
+      sh -c "mkdir -p /data /uploads/images /uploads/models
+             && chown -R 1001:1001 /data /uploads"
+    volumes:
+      - ./data:/data
+      - ./public/uploads:/uploads
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 3d-printing-assistant:latest
+    container_name: 3d-printing-assistant
+    restart: unless-stopped
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    ports:
+      - "80:3000"
+    env_file:
+      - .env.production
+    volumes:
+      - ./data:/app/data
+      - ./public/uploads:/app/public/uploads
