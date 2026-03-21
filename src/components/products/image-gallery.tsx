@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Star, ArrowUp, ArrowDown, Trash2, Upload, Loader2 } from "lucide-react";
+import { Star, ArrowUp, ArrowDown, Trash2, Upload, Loader2, Download, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useProductAssets, useCreateAsset, useUpdateAsset, useDeleteAsset } from "@/lib/hooks/use-products";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ export function ImageGallery({ productId }: { productId: string }) {
   const { mutate: updateAsset } = useUpdateAsset(productId);
   const { mutate: deleteAsset, isPending: isDeleting } = useDeleteAsset(productId);
   const [uploading, setUploading] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const images: ProductAsset[] = (data?.data ?? []).filter((a: ProductAsset) => a.assetType === "IMAGE");
 
@@ -109,6 +111,16 @@ export function ImageGallery({ productId }: { productId: string }) {
     });
   }
 
+  useEffect(() => {
+    if (previewIndex === null) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "ArrowLeft") setPreviewIndex((i) => (i !== null && i > 0 ? i - 1 : i));
+      if (e.key === "ArrowRight") setPreviewIndex((i) => (i !== null && i < images.length - 1 ? i + 1 : i));
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [previewIndex, images.length]);
+
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading images…</p>;
 
   return (
@@ -144,7 +156,8 @@ export function ImageGallery({ productId }: { productId: string }) {
               <img
                 src={image.storagePath}
                 alt={image.fileName}
-                className="w-full aspect-square object-cover"
+                className="w-full aspect-square object-cover cursor-zoom-in"
+                onClick={() => setPreviewIndex(idx)}
               />
               {image.isPrimary && (
                 <span className="absolute top-1 left-1 flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-medium px-1.5 py-0.5 rounded">
@@ -152,27 +165,38 @@ export function ImageGallery({ productId }: { productId: string }) {
                 </span>
               )}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                <div className="flex justify-end gap-1">
+                <div className="flex justify-between gap-1">
                   <Button
                     variant="secondary"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => handleReorder(image.id, "up")}
-                    disabled={idx === 0}
-                    title="Move up"
+                    title="Preview"
+                    onClick={(e) => { e.stopPropagation(); setPreviewIndex(idx); }}
                   >
-                    <ArrowUp className="h-3.5 w-3.5" />
+                    <ZoomIn className="h-3.5 w-3.5" />
                   </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => handleReorder(image.id, "down")}
-                    disabled={idx === images.length - 1}
-                    title="Move down"
-                  >
-                    <ArrowDown className="h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(e) => { e.stopPropagation(); handleReorder(image.id, "up"); }}
+                      disabled={idx === 0}
+                      title="Move up"
+                    >
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(e) => { e.stopPropagation(); handleReorder(image.id, "down"); }}
+                      disabled={idx === images.length - 1}
+                      title="Move down"
+                    >
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex gap-1">
                   {!image.isPrimary && (
@@ -180,14 +204,30 @@ export function ImageGallery({ productId }: { productId: string }) {
                       variant="secondary"
                       size="sm"
                       className="h-7 text-xs flex-1"
-                      onClick={() => handleSetPrimary(image.id)}
+                      onClick={(e) => { e.stopPropagation(); handleSetPrimary(image.id); }}
                     >
                       Set Primary
                     </Button>
                   )}
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-7 w-7"
+                    title="Download"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const url = `/api/uploads/download?path=${encodeURIComponent(image.storagePath)}&fileName=${encodeURIComponent(image.fileName)}&mimeType=${encodeURIComponent(image.mimeType)}`;
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = image.fileName;
+                      a.click();
+                    }}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                  </Button>
                   <ConfirmDialog
                     trigger={
-                      <Button variant="destructive" size="icon" className="h-7 w-7" disabled={isDeleting}>
+                      <Button variant="destructive" size="icon" className="h-7 w-7" disabled={isDeleting} onClick={(e) => e.stopPropagation()}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     }
@@ -207,6 +247,48 @@ export function ImageGallery({ productId }: { productId: string }) {
       {images.length === 0 && !uploading && (
         <p className="text-sm text-muted-foreground text-center py-2">No images yet.</p>
       )}
+
+      <Dialog open={previewIndex !== null} onOpenChange={(open) => !open && setPreviewIndex(null)}>
+        <DialogContent className="max-w-4xl p-0 bg-black/90 border-none">
+          <DialogTitle className="sr-only">Image preview</DialogTitle>
+          {previewIndex !== null && (() => {
+            const img = images[previewIndex];
+            return (
+              <div className="relative flex flex-col items-center">
+                {previewIndex > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:bg-white/10 z-10"
+                    onClick={() => setPreviewIndex(previewIndex - 1)}
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                )}
+                {previewIndex < images.length - 1 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:bg-white/10 z-10"
+                    onClick={() => setPreviewIndex(previewIndex + 1)}
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                )}
+                <img
+                  src={img.storagePath}
+                  alt={img.fileName}
+                  className="max-h-[80vh] max-w-full object-contain"
+                />
+                <div className="w-full flex justify-between items-center px-4 py-2 text-white text-xs bg-black/60">
+                  <span className="truncate">{img.fileName}</span>
+                  <span>{previewIndex + 1} / {images.length}</span>
+                </div>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
