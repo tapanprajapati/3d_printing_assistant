@@ -3,7 +3,7 @@
 import React, { Component, Suspense } from "react";
 import { Canvas, useLoader, useThree } from "@react-three/fiber";
 import { OrbitControls, Bounds, Center } from "@react-three/drei";
-import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { AlertTriangle } from "lucide-react";
 import * as THREE from "three";
 
