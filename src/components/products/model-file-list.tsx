@@ -2,10 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Trash2, Upload, Loader2, File } from "lucide-react";
+import { Trash2, Upload, Loader2, File, Download, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { StlViewerDialog } from "./stl-viewer-dialog";
 import { useProductAssets, useCreateAsset, useUpdateAsset, useDeleteAsset } from "@/lib/hooks/use-products";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -97,6 +98,11 @@ export function ModelFileList({ productId }: { productId: string }) {
   const { mutate: updateAsset } = useUpdateAsset(productId);
   const { mutate: deleteAsset, isPending: isDeleting } = useDeleteAsset(productId);
   const [uploading, setUploading] = useState(false);
+  const [previewAsset, setPreviewAsset] = useState<ProductAsset | null>(null);
+
+  function isPreviewable(a: ProductAsset) {
+    return a.assetType === "MODEL_STL";
+  }
 
   const models: ProductAsset[] = (data?.data ?? []).filter((a: ProductAsset) =>
     MODEL_ASSET_TYPES.includes(a.assetType)
@@ -217,6 +223,32 @@ export function ModelFileList({ productId }: { productId: string }) {
                     }
                   />
                 </div>
+                {isPreviewable(model) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    title="Preview 3D model"
+                    onClick={() => setPreviewAsset(model)}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="Download"
+                  onClick={() => {
+                    const url = `/api/uploads/download?path=${encodeURIComponent(model.storagePath)}&fileName=${encodeURIComponent(model.fileName)}&mimeType=${encodeURIComponent(model.mimeType)}`;
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = model.fileName;
+                    a.click();
+                  }}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
                 <ConfirmDialog
                   trigger={
                     <Button variant="ghost" size="icon" className="h-7 w-7" disabled={isDeleting}>
@@ -236,6 +268,16 @@ export function ModelFileList({ productId }: { productId: string }) {
 
       {models.length === 0 && !uploading && (
         <p className="text-sm text-muted-foreground text-center py-2">No model files yet.</p>
+      )}
+
+      {previewAsset && (
+        <StlViewerDialog
+          open={true}
+          onOpenChange={(open) => { if (!open) setPreviewAsset(null); }}
+          fileName={previewAsset.fileName}
+          storagePath={previewAsset.storagePath}
+          mimeType={previewAsset.mimeType}
+        />
       )}
     </div>
   );
