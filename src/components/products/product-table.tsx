@@ -17,6 +17,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useDeleteProduct } from "@/lib/hooks/use-products";
 import { toast } from "sonner";
 import type { Product } from "@/components/products/product-card";
+import { uploadDownloadUrl } from "@/lib/upload-dir";
 
 const STATUS_STYLES: Record<string, string> = {
   ACTIVE: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -47,7 +48,7 @@ function ProductRow({ product }: { product: Product }) {
       <TableCell className="w-12">
         {primaryImage ? (
           <img
-            src={primaryImage.storagePath}
+            src={uploadDownloadUrl(primaryImage.storagePath, primaryImage.fileName, primaryImage.mimeType ?? "image/jpeg", true)}
             alt={primaryImage.fileName}
             className="h-10 w-10 rounded object-cover bg-muted"
           />

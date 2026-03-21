@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useDeleteProduct } from "@/lib/hooks/use-products";
 import { toast } from "sonner";
+import { uploadDownloadUrl } from "@/lib/upload-dir";
 
 export interface Product {
   id: string;
@@ -16,7 +17,7 @@ export interface Product {
   category: string;
   status: "DRAFT" | "ACTIVE" | "ARCHIVED";
   _count: { variants: number; listings: number };
-  assets?: { storagePath: string; fileName: string }[];
+  assets?: { storagePath: string; fileName: string; mimeType?: string }[];
 }
 
 interface ProductCardProps {
@@ -47,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {primaryImage && (
         <div className="w-full aspect-video overflow-hidden rounded-t-lg bg-muted">
           <img
-            src={primaryImage.storagePath}
+            src={uploadDownloadUrl(primaryImage.storagePath, primaryImage.fileName, primaryImage.mimeType ?? "image/jpeg", true)}
             alt={primaryImage.fileName}
             className="w-full h-full object-cover"
           />

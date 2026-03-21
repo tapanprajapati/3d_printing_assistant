@@ -9,6 +9,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useProductAssets, useCreateAsset, useUpdateAsset, useDeleteAsset } from "@/lib/hooks/use-products";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { uploadDownloadUrl } from "@/lib/upload-dir";
 
 interface ProductAsset {
   id: string;
@@ -154,7 +155,7 @@ export function ImageGallery({ productId }: { productId: string }) {
           {images.map((image, idx) => (
             <div key={image.id} className="relative group border rounded-lg overflow-hidden bg-muted/30">
               <img
-                src={image.storagePath}
+                src={uploadDownloadUrl(image.storagePath, image.fileName, image.mimeType, true)}
                 alt={image.fileName}
                 className="w-full aspect-square object-cover cursor-zoom-in"
                 onClick={() => setPreviewIndex(idx)}
@@ -276,7 +277,7 @@ export function ImageGallery({ productId }: { productId: string }) {
                   </Button>
                 )}
                 <img
-                  src={img.storagePath}
+                  src={uploadDownloadUrl(img.storagePath, img.fileName, img.mimeType, true)}
                   alt={img.fileName}
                   className="max-h-[80vh] max-w-full object-contain"
                 />

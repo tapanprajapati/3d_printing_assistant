@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   const storagePath = searchParams.get("path") ?? "";
   const fileName = searchParams.get("fileName") ?? "download";
   const mimeType = searchParams.get("mimeType") ?? "application/octet-stream";
+  const inline = searchParams.get("inline") === "true";
 
   if (!ALLOWED_PATH_RE.test(storagePath)) {
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
@@ -27,7 +28,9 @@ export async function GET(req: NextRequest) {
   return new NextResponse(webStream, {
     headers: {
       "Content-Type": mimeType,
-      "Content-Disposition": `attachment; filename="${fileName.replace(/"/g, '\\"')}"`,
+      "Content-Disposition": inline
+        ? `inline; filename="${fileName.replace(/"/g, '\\"')}"`
+        : `attachment; filename="${fileName.replace(/"/g, '\\"')}"`,
     },
   });
 }

@@ -10,3 +10,13 @@ export function storagePathToDisk(storagePath: string): string {
   const relative = storagePath.replace(/^\/uploads\//, "");
   return join(getUploadDir(), relative);
 }
+
+export function uploadDownloadUrl(
+  storagePath: string,
+  fileName: string,
+  mimeType: string,
+  inline = false
+): string {
+  const base = `/api/uploads/download?path=${encodeURIComponent(storagePath)}&fileName=${encodeURIComponent(fileName)}&mimeType=${encodeURIComponent(mimeType)}`;
+  return inline ? `${base}&inline=true` : base;
+}

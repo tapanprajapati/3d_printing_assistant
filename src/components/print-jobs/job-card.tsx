@@ -11,6 +11,7 @@ import { CompleteDialog } from "@/components/print-jobs/complete-dialog";
 import { useUpdatePrintJob } from "@/lib/hooks/use-print-jobs";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { uploadDownloadUrl } from "@/lib/upload-dir";
 
 interface PrintJobCardJob {
   id: string;
@@ -20,7 +21,7 @@ interface PrintJobCardJob {
   actualHours?: number | null;
   scheduledAt?: string | null;
   notes?: string | null;
-  product?: { id: string; name: string; assets?: { storagePath: string; fileName: string }[] } | null;
+  product?: { id: string; name: string; assets?: { storagePath: string; fileName: string; mimeType?: string }[] } | null;
   variant?: { id: string; name: string } | null;
   filament?: { id: string; brand: string; colorName: string; colorHex: string; type: string } | null;
 }
@@ -94,7 +95,7 @@ export function JobCard({ job }: JobCardProps) {
             <div className="flex items-center gap-2">
               {job.product.assets?.[0] && (
                 <img
-                  src={job.product.assets[0].storagePath}
+                  src={uploadDownloadUrl(job.product.assets[0].storagePath, job.product.assets[0].fileName, job.product.assets[0].mimeType ?? "image/jpeg", true)}
                   alt={job.product.assets[0].fileName}
                   className="h-8 w-8 rounded object-cover bg-muted shrink-0"
                 />
