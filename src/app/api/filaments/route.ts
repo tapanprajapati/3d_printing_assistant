@@ -13,14 +13,14 @@ export async function GET(req: Request) {
   const where: Record<string, unknown> = {};
   if (type) where.type = type;
 
-  const filaments = await prisma.filament.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-  });
+  const [filaments, appSettings] = await Promise.all([
+    prisma.filament.findMany({ where, orderBy: { createdAt: "desc" } }),
+    lowStock ? prisma.appSettings.findFirst({ where: { id: "default" } }) : null,
+  ]);
 
   const filtered = lowStock
     ? filaments.filter((f) => {
-        const threshold = f.lowStockThresholdG ?? 100;
+        const threshold = f.lowStockThresholdG ?? appSettings?.lowStockThresholdG ?? 100;
         return f.remainingWeightG < threshold;
       })
     : filaments;

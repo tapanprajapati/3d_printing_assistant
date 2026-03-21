@@ -10,12 +10,15 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const filaments = await prisma.filament.findMany({
-    select: { remainingWeightG: true, lowStockThresholdG: true },
-  });
+  const [filaments, appSettings] = await Promise.all([
+    prisma.filament.findMany({
+      select: { remainingWeightG: true, lowStockThresholdG: true },
+    }),
+    prisma.appSettings.findFirst({ where: { id: "default" } }),
+  ]);
 
   const lowStockCount = filaments.filter(
-    (f) => f.remainingWeightG < (f.lowStockThresholdG ?? 100)
+    (f) => f.remainingWeightG < (f.lowStockThresholdG ?? appSettings?.lowStockThresholdG ?? 100)
   ).length;
 
   return (

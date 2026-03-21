@@ -1255,13 +1255,13 @@ Each milestone is independently deployable and demo-able.
 **Goal:** Revenue and profit charts with date range filtering.
 
 **Deliverables:**
-- [ ] `GET /api/analytics` with monthly aggregation
-- [ ] Monthly revenue bar chart (Recharts)
-- [ ] Monthly profit line overlay
-- [ ] Top 5 products by margin table
-- [ ] Filament consumption pie chart
-- [ ] Date range picker filter (default: current calendar year)
-- [ ] Summary stat row (total revenue, total profit, overall margin %, jobs completed)
+- [x] `GET /api/analytics` with monthly aggregation
+- [x] Monthly revenue bar chart (Recharts)
+- [x] Monthly profit line overlay
+- [x] Top 5 products by margin table
+- [x] Filament consumption pie chart
+- [x] Date range picker filter (default: current calendar year)
+- [x] Summary stat row (total revenue, total profit, overall margin %, jobs completed)
 
 **Acceptance criteria:**
 - Charts render correctly after completing print jobs in Milestone 5
@@ -1274,13 +1274,13 @@ Each milestone is independently deployable and demo-able.
 **Goal:** Settings page, all defaults wired up, responsive + UX polish.
 
 **Deliverables:**
-- [ ] `GET/PATCH /api/settings`
-- [ ] Settings page form: all configurable fields
-- [ ] Calculator reads defaults from settings API on load
-- [ ] Global low-stock threshold respected by topbar badge and dashboard widget
-- [ ] Loading skeletons on all list/detail pages
-- [ ] Toast notifications on all create/update/delete mutations
-- [ ] Error boundaries on all pages
+- [x] `GET/PATCH /api/settings`
+- [x] Settings page form: all configurable fields
+- [x] Calculator reads defaults from settings API on load
+- [x] Global low-stock threshold respected by topbar badge and dashboard widget
+- [x] Loading skeletons on all list/detail pages
+- [x] Toast notifications on all create/update/delete mutations
+- [x] Error boundaries on all pages
 - [ ] Responsive testing pass at 375px, 768px, 1280px
 - [ ] Accessibility: all form fields have labels, buttons have aria labels, focus ring visible
 

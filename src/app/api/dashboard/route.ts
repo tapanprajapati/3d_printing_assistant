@@ -19,6 +19,7 @@ export async function GET() {
     inProgressJobs,
     completedJobs,
     recentJobs,
+    appSettings,
   ] = await Promise.all([
     prisma.filament.count(),
     prisma.filament.findMany({
@@ -56,10 +57,11 @@ export async function GET() {
         estimatedHours: true,
       },
     }),
+    prisma.appSettings.findFirst({ where: { id: "default" } }),
   ]);
 
   const lowStockFilaments = allFilaments.filter(
-    (f) => f.remainingWeightG < (f.lowStockThresholdG ?? 100),
+    (f) => f.remainingWeightG < (f.lowStockThresholdG ?? appSettings?.lowStockThresholdG ?? 100),
   );
 
   return Response.json({

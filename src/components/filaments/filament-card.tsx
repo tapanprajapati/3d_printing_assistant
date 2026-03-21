@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ColorSwatch } from "@/components/filaments/color-swatch";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useDeleteFilament } from "@/lib/hooks/use-filaments";
+import { useSettings } from "@/lib/hooks/use-settings";
 import { toast } from "sonner";
 
 export interface Filament {
@@ -31,8 +32,9 @@ interface FilamentCardProps {
 export function FilamentCard({ filament }: FilamentCardProps) {
   const router = useRouter();
   const { mutate: deleteFilament, isPending: isDeleting } = useDeleteFilament();
+  const { data: appSettings } = useSettings();
 
-  const threshold = filament.lowStockThresholdG ?? 100;
+  const threshold = filament.lowStockThresholdG ?? appSettings?.lowStockThresholdG ?? 100;
   const isLowStock = filament.remainingWeightG < threshold;
   const progressValue = filament.totalWeightG > 0
     ? Math.round((filament.remainingWeightG / filament.totalWeightG) * 100)

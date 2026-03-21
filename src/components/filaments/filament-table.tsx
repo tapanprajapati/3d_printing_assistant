@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ColorSwatch } from "@/components/filaments/color-swatch";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useDeleteFilament } from "@/lib/hooks/use-filaments";
+import { useSettings } from "@/lib/hooks/use-settings";
 import { toast } from "sonner";
 import type { Filament } from "@/components/filaments/filament-card";
 
@@ -27,8 +28,9 @@ interface FilamentTableProps {
 function FilamentRow({ filament }: { filament: Filament }) {
   const router = useRouter();
   const { mutate: deleteFilament, isPending: isDeleting } = useDeleteFilament();
+  const { data: appSettings } = useSettings();
 
-  const threshold = filament.lowStockThresholdG ?? 100;
+  const threshold = filament.lowStockThresholdG ?? appSettings?.lowStockThresholdG ?? 100;
   const isLowStock = filament.remainingWeightG < threshold;
 
   function handleDelete() {
