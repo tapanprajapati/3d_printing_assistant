@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { getUploadDir } from "@/lib/upload-dir";
 
@@ -51,6 +51,7 @@ export async function POST(req: Request) {
   const storagePath = `/uploads/${subDir}/${newFileName}`;
   const diskPath = join(getUploadDir(), subDir, newFileName);
 
+  await mkdir(join(getUploadDir(), subDir), { recursive: true });
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(diskPath, buffer);
 
