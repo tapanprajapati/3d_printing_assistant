@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProductAssetUpdateSchema } from "@/lib/validations/product";
 import { unlink } from "fs/promises";
-import { join } from "path";
+import { storagePathToDisk } from "@/lib/upload-dir";
 
 interface Params {
   params: { id: string; assetId: string };
@@ -59,7 +59,7 @@ export async function DELETE(_req: Request, { params }: Params) {
 
   // Delete file from disk
   try {
-    const diskPath = join(process.cwd(), "public", asset.storagePath);
+    const diskPath = storagePathToDisk(asset.storagePath);
     await unlink(diskPath);
   } catch {
     // File may already be gone; continue

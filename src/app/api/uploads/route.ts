@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { writeFile } from "fs/promises";
 import { join } from "path";
+import { getUploadDir } from "@/lib/upload-dir";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_MODEL_EXTENSIONS = [".stl", ".3mf", ".obj"];
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
   const newFileName = `${uuid}${ext}`;
   const subDir = uploadType === "image" ? "images" : "models";
   const storagePath = `/uploads/${subDir}/${newFileName}`;
-  const diskPath = join(process.cwd(), "public", "uploads", subDir, newFileName);
+  const diskPath = join(getUploadDir(), subDir, newFileName);
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(diskPath, buffer);
